@@ -1,11 +1,10 @@
-import dotenv from 'dotenv'
-import express from 'express'
-import dbConnect from './src/db/index.js';
-dotenv.config({
-    path : './.env'
-})
+import dotenv from "dotenv"
+import dbConnect from "./db/index.js";
+import { app } from "./app.js";
 
-const app = express(); 
+dotenv.config({
+    path : "./.env"
+})
 
 dbConnect()
 .then(()=>{
