@@ -196,4 +196,33 @@ const refreshTheAccessToken = asyncHandler(async (req,res)=>{
     }
 })
 
-export {registerUser , loginUser , logoutUser , refreshTheAccessToken}
+const changePassword = asyncHandler(async (req,res)=>{
+    const {oldPassword , newPassword} = req.body
+
+    if(!oldPassword || !newPassword){
+        throw new ApiError(400, "All field are required")
+    }
+    
+    const user = await User.findById(req.user._id)
+    console.log("user" , user)
+    if(!user){
+        throw new ApiError(400,"unauthorized access")
+    }
+    
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+    
+    if(!isPasswordCorrect){
+        throw new ApiError(400,"Incorrect old password")
+    }
+    
+    user.password = newPassword
+    await user.save();
+    
+    return res.status(202)
+    .json(
+        new ApiResponse(202, null, "Password changed successfully")
+    )
+    
+})
+
+export {registerUser , loginUser , logoutUser , refreshTheAccessToken, changePassword}
