@@ -14,13 +14,15 @@ app.use(cors({
     credentials : true
 }))
 
-import userRouter from './routes/user.routes.js'
+import userRouter from "./routes/user.routes.js"
+import subscriptionRouter from "./routes/subscription.routes.js"
 
 app.use("/api/v1/users",userRouter)
+app.use("/api/v1/subscription",userRouter)
 
 
 app.use((err, req, res, next)=>{
-    console.log("hii error is here")
+    console.log("Hii error is here")
     console.log(err)
     return res.status(err.statusCode || 500).json({
         message : err.errorStack ? err.message : "Server Error",
