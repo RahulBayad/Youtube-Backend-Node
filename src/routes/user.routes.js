@@ -5,7 +5,10 @@ import {
     registerUser, 
     refreshTheAccessToken, 
     changePassword, 
-    getCurrentUser
+    getCurrentUser,
+    updateUserAvatar,
+    updateUserCoverImage,
+    updateAccountDetails
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { jwtVerify } from "../middlewares/auth.middleware.js";
@@ -16,7 +19,10 @@ router.route("/register").post(upload.fields([{name : "avatar",maxCount:1},{name
 router.route("/login").post(loginUser)  
 router.route("/logout").post(jwtVerify, logoutUser)
 router.route("/refresh-token").post(refreshTheAccessToken)
-router.route("/changePassword").post(jwtVerify, changePassword)
-router.route("/changePassword").get(jwtVerify, getCurrentUser)
+router.route("/change-password").post(jwtVerify, changePassword)
+router.route("/current-user").get(jwtVerify, getCurrentUser)
+router.route("/update-account").post(jwtVerify, updateAccountDetails)
+router.route("/avatar").post(jwtVerify, updateUserAvatar)
+router.route("/coverimage").post(jwtVerify, updateUserCoverImage)
 
 export default router
