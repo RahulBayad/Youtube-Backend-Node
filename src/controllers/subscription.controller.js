@@ -11,6 +11,10 @@ const channelSubscribe = asyncHandler(async (req,res)=>{
         throw new ApiError(400, "Unauthorized access")
     }
     const channelName = req.params.username
+
+    if(!channelName){
+        throw new ApiError(400, "Please provide username")
+    }
     
     const channel = await User.findOne({username : channelName}).select("-password -refreshToken -watchHistory")
 

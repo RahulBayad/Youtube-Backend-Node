@@ -4,6 +4,6 @@ import { jwtVerify } from "../middlewares/auth.middleware.js";
 
 const router = Router()
 
-router.route("subscribe").post(jwtVerify , channelSubscribe)
+router.route("/subscribe/:username").post(jwtVerify , channelSubscribe)
 
 export default router
