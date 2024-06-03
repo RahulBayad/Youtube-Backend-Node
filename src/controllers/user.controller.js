@@ -4,6 +4,7 @@ import { asyncHandler } from './../utils/asyncHandler.js'
 import { ApiError } from "./../utils/ApiError.js"
 import { ApiResponse } from "./../utils/ApiResponse.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Schema } from "mongoose";
 
 const generateAccessAndRefreshToken = async (userId) =>{
     const user = await User.findById(userId)
@@ -394,6 +395,65 @@ const getUserChannelProfile = asyncHandler(async (req,res)=>{
     )
 })
 
+const getWatchHistory = asyncHandler(async (req,res)=>{
+    if(!req.user){
+        throw new ApiError(400, "Access Denied")
+    }
+
+    const watchHistory = await User.aggregate([
+        {
+            $match : {
+                _id : new Schema.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup : {
+                from : "videos",
+                localField : "watchHistory",
+                foreignField : "_id",
+                as : "watchHistory",
+                pipeline : [
+                    {
+                        $lookup : {
+                            from : "users",
+                            localField : "owner",
+                            foreignField : "_id",
+                            as : "owner",
+                            pipeline : [
+                                {
+                                    $project : {
+                                        username : 1,
+                                        fullName : 1,
+                                        avatar : 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields : {
+                            owner : {
+                                $first : "$owner"
+                                // $arrayElemAt : ["$owner", 0]
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    if(!watchHistory.length){
+        throw new ApiError(500,"No videos in your watch history")
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, watchHistory[0], "Watch History fetched successfully")
+    )
+})
+
+
 export {
     registerUser , 
     loginUser , 
@@ -404,5 +464,6 @@ export {
     updateAccountDetails,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 }
